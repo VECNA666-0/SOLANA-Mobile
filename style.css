@@ -1,0 +1,25 @@
+body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: #000; color: #fff; text-align: center; }
+header { position: fixed; top: 20px; right: 20px; z-index: 10; }
+.connect-btn { background: #a0ffcb; color: #000; padding: 15px 35px; font-size: 1.4em; border-radius: 50px; cursor: pointer; font-weight: bold; }
+.container { max-width: 1200px; margin: 0 auto; padding: 120px 20px 60px; }
+.skr-logo { width: 200px; margin: 60px auto; display: block; }
+.solana-logo { width: 320px; margin: 40px auto 60px; display: block; }
+h1 { font-size: 7em; font-weight: 900; margin: 0; letter-spacing: -5px; }
+.subtitle { font-size: 2.2em; color: #a0ffcb; margin: 40px 0; }
+p { font-size: 1.6em; line-height: 1.8; max-width: 900px; margin: 40px auto; }
+.highlight { color: #a0ffcb; }
+.claim-btn { background: #a0ffcb; color: #000; padding: 25px 80px; font-size: 2.2em; border-radius: 60px; cursor: pointer; font-weight: bold; margin: 40px 0; }
+.claim-btn:disabled { background: #444; opacity: 0.6; cursor: not-allowed; }
+#status { font-size: 1.6em; min-height: 100px; margin: 40px; word-break: break-all; }
+table { width: 90%; max-width: 1000px; margin: 80px auto; border-collapse: collapse; background: #111; }
+th, td { padding: 30px; border: 1px solid #333; font-size: 1.4em; text-align: left; }
+th { background: #222; color: #a0ffcb; }
+@media (max-width: 768px) {
+    h1 { font-size: 4.5em; }
+    .subtitle { font-size: 1.8em; }
+    p { font-size: 1.4em; }
+    .skr-logo { width: 150px; }
+    .solana-logo { width: 250px; }
+    .claim-btn { width: 90%; padding: 30px; font-size: 2.2em; }
+    .connect-btn { padding: 15px 30px; font-size: 1.6em; }
+}
